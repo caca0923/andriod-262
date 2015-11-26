@@ -36,12 +36,18 @@ public class MainActivity extends AppCompatActivity {
         inputText2.setText("54321");
 
         hideCheckBox = (CheckBox)findViewById(R.id.hideCheckBox);
-        hideCheckBox.setChecked(true);
+        //hideCheckBox.setChecked(true);
+
     }
 
     public void submit(View view){
-        String text = inputText2.getText().toString();
+        String text = inputText1.getText().toString();
+        //檢查hide有沒勾
+        if(hideCheckBox.isChecked()){
+            text = "*********";
+            inputText1.setText("*********");
+        }
         Toast.makeText(this,text,Toast.LENGTH_LONG).show();
-        inputText2.setText("");
+        //inputText1.setText("");
     }
 }
