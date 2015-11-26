@@ -41,4 +41,13 @@
         android:layout_alignRight="@+id/button"
         android:layout_alignEnd="@+id/button" />
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hide"
+        android:id="@+id/hideCheckBox"
+        android:layout_below="@+id/editText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>
