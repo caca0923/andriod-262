@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -46,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
         inputText2.setText(sharedPreferences.getString("inputText","??"));
 
         hideCheckBox = (CheckBox)findViewById(R.id.hideCheckBox);
+        hideCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                editor.putBoolean("hideCheckBox",isChecked);
+                editor.commit();
+            }
+        });
+        hideCheckBox.setChecked(sharedPreferences.getBoolean("hideCheckBox",false));
         //hideCheckBox.setChecked(true);
 
     }
@@ -54,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         String text = inputText1.getText().toString();
         editor.putString("inputText",text);
         editor.commit(); //要加上commit才能寫入
+
+        Utils.writeFile(this,"history.txt",text+"\n");
 
         //檢查hide有沒勾
         if(hideCheckBox.isChecked()){
