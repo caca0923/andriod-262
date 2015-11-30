@@ -64,14 +64,20 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("inputText",text);
         editor.commit(); //要加上commit才能寫入
 
-        Utils.writeFile(this,"history.txt",text+"\n");
+        Utils.writeFile(this, "history.txt", text + "\n");
 
         //檢查hide有沒勾
         if(hideCheckBox.isChecked()){
             text = "*********";
             inputText1.setText("*********");
         }
-        Toast.makeText(this,text,Toast.LENGTH_LONG).show();
+
+        //顯示text資料
+        //Toast.makeText(this,text,Toast.LENGTH_LONG).show();
+
+        // 從history.txt 取出submit內容
+        String fileContent = Utils.readFile(this,"history.txt");
+        Toast.makeText(this,fileContent,Toast.LENGTH_LONG).show();
         //inputText1.setText("");
     }
 }
