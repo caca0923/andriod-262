@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputText2;
     private CheckBox hideCheckBox;
     private ListView historyListView;
+    private Spinner storeInfoSpinner;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        storeInfoSpinner = (Spinner)findViewById(R.id.storeInfoSpinner);
 
         sharedPreferences = getSharedPreferences("setting", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -62,6 +66,13 @@ public class MainActivity extends AppCompatActivity {
 
         historyListView = (ListView)findViewById(R.id.historyListView);
         setHistory();
+        setStoreInfo();
+    }
+
+    private void setStoreInfo() {
+        String[] stores = getResources().getStringArray(R.array.storeInfo);
+        ArrayAdapter<String> storeApapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,stores);
+        storeInfoSpinner.setAdapter(storeApapter);
     }
 
     private void setHistory(){
