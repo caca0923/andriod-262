@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         inputText2 = (EditText)findViewById(R.id.editText);
-        inputText2.setText("54321");
+        //inputText2.setText("54321");
+        inputText2.setText(sharedPreferences.getString("inputText","??"));
 
         hideCheckBox = (CheckBox)findViewById(R.id.hideCheckBox);
         //hideCheckBox.setChecked(true);
