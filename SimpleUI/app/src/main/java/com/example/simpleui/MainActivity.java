@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         setHistory();
     }
 
+
+
     public void goToMenu(View view){
         Intent intent = new Intent();
         intent.setClass(this,DrinkMenuActivity.class);
