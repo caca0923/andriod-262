@@ -16,8 +16,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText inputText1;
-    private EditText inputText2;
+    private EditText inputText;
     private CheckBox hideCheckBox;
     private ListView historyListView;
     private Spinner storeInfoSpinner;
@@ -29,19 +28,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        storeInfoSpinner = (Spinner)findViewById(R.id.storeInfoSpinner);
-
-        sharedPreferences = getSharedPreferences("setting", Context.MODE_PRIVATE);
+        storeInfoSpinner = (Spinner) findViewById(R.id.storeInfoSpinner);
+        sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-        inputText1 = (EditText)findViewById(R.id.inputText);
-        inputText1.setText("12345");
-        inputText1.setOnKeyListener(new View.OnKeyListener() {
+        inputText = (EditText)findViewById(R.id.inputText);
+//        inputText.setText("1234");
+        inputText.setText(sharedPreferences.getString("inputText", ""));
+        inputText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction() == KeyEvent.ACTION_DOWN){
-                    if(keyCode == KeyEvent.KEYCODE_ENTER){
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_ENTER) {
                         submit(v);
                         return true;
                     }
@@ -49,11 +47,8 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        inputText2 = (EditText)findViewById(R.id.editText);
-        //inputText2.setText("54321");
-        inputText2.setText(sharedPreferences.getString("inputText","??"));
 
-        hideCheckBox = (CheckBox)findViewById(R.id.hideCheckBox);
+        hideCheckBox = (CheckBox) findViewById(R.id.hideCheckBox);
         hideCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -61,48 +56,40 @@ public class MainActivity extends AppCompatActivity {
                 editor.commit();
             }
         });
-        hideCheckBox.setChecked(sharedPreferences.getBoolean("hideCheckBox",false));
-        //hideCheckBox.setChecked(true);
+        hideCheckBox.setChecked(sharedPreferences.getBoolean("hideCheckBox", false));
 
-        historyListView = (ListView)findViewById(R.id.historyListView);
+        historyListView = (ListView) findViewById(R.id.historyListView);
         setHistory();
         setStoreInfo();
+
     }
 
     private void setStoreInfo() {
         String[] stores = getResources().getStringArray(R.array.storeInfo);
-        ArrayAdapter<String> storeApapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line,stores);
-        storeInfoSpinner.setAdapter(storeApapter);
+        ArrayAdapter<String> storeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, stores);
+        storeInfoSpinner.setAdapter(storeAdapter);
     }
 
-    private void setHistory(){
-        //String[] data = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-        String[] data = Utils.readFile(this,"history.txt").split("\n");
+    private void setHistory() {
+        String[] data = Utils.readFile(this, "history.txt").split("\n");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
         historyListView.setAdapter(adapter);
     }
 
     public void submit(View view){
-        String text = inputText1.getText().toString();
-        editor.putString("inputText",text);
-        editor.commit(); //要加上commit才能寫入
-
+        String text = inputText.getText().toString();
+        editor.putString("inputText", text);
+        editor.commit();
         Utils.writeFile(this, "history.txt", text + "\n");
-
-        //檢查hide有沒勾
         if(hideCheckBox.isChecked()){
-            text = "*********";
-            inputText1.setText("*********");
+            text = "**********";
+            inputText.setText("***********");
         }
-
-        //顯示text資料
-        //Toast.makeText(this,text,Toast.LENGTH_LONG).show();
-
-        // 從history.txt 取出submit內容
-        //String fileContent = Utils.readFile(this,"history.txt");
-        //Toast.makeText(this,fileContent,Toast.LENGTH_LONG).show();
-
-        //submit後重畫listview
         setHistory();
+    }
+
+    public void goToMenu(View view){
+
+        
     }
 }
