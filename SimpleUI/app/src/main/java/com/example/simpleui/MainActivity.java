@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,12 +12,20 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
+
+import com.parse.Parse;
+import com.parse.ParseObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this);
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
+
         setContentView(R.layout.activity_main);
         storeInfoSpinner = (Spinner) findViewById(R.id.storeInfoSpinner);
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
@@ -81,8 +96,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setHistory() {
-        String[] data = Utils.readFile(this, "history.txt").split("\n");
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
+        String[] rawData = Utils.readFile(this, "history.txt").split("\n");
+
+        List<Map<String,String>> data = new ArrayList<>();
+        for (int i = 0 ; i < rawData.length; i++){
+            try {
+                JSONObject object = new JSONObject(rawData[i]);
+                String note = object.getString("note");
+                JSONArray array = object.getJSONArray("menu");
+
+                Map<String,String> item = new HashMap<>();
+                item.put("note",note);
+                item.put("drinkNum","15");
+                item.put("storeInfo","NTU Store");
+                data.add(item);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        String[] from = {"note","drinkNum","storeInfo"};
+        int[] to = {R.id.note,R.id.drinkNum,R.id.storeInfo};
+        SimpleAdapter adapter = new SimpleAdapter(this,data,R.layout.listview_item,from,to);
+
+        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
         historyListView.setAdapter(adapter);
     }
     /*
@@ -98,10 +137,11 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             JSONObject orderData = new JSONObject();
+            if (menuResult == null) menuResult = "[]";
             JSONArray array = new JSONArray(menuResult);
             orderData.put("note", text);
             orderData.put("menu", array);
-            Utils.writeFile(this, "history.txt", orderData.toString());
+            Utils.writeFile(this, "history.txt", orderData.toString() + "\n");
 
         } catch (JSONException e) {
             e.printStackTrace();
