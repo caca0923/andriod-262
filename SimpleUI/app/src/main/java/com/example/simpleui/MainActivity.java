@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,7 +16,13 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_CODE_MENU_ACTIVITY = 1;
 
     private EditText inputText;
     private CheckBox hideCheckBox;
@@ -25,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
+    private String menuResult;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-        inputText = (EditText)findViewById(R.id.inputText);
+        inputText = (EditText) findViewById(R.id.inputText);
 //        inputText.setText("1234");
         inputText.setText(sharedPreferences.getString("inputText", ""));
         inputText.setOnKeyListener(new View.OnKeyListener() {
@@ -76,25 +85,48 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
         historyListView.setAdapter(adapter);
     }
-
-    public void submit(View view){
+    /*
+    {
+        "note": "this is a note",
+        "menu": [...]
+    }
+    */
+    public void submit(View view) {
         String text = inputText.getText().toString();
         editor.putString("inputText", text);
         editor.commit();
-        Utils.writeFile(this, "history.txt", text + "\n");
-        if(hideCheckBox.isChecked()){
+
+        try {
+            JSONObject orderData = new JSONObject();
+            JSONArray array = new JSONArray(menuResult);
+            orderData.put("note", text);
+            orderData.put("menu", array);
+            Utils.writeFile(this, "history.txt", orderData.toString());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (hideCheckBox.isChecked()) {
             text = "**********";
             inputText.setText("***********");
         }
         setHistory();
     }
 
-
-
-    public void goToMenu(View view){
+    public void goToMenu(View view) {
         Intent intent = new Intent();
-        intent.setClass(this,DrinkMenuActivity.class);
-        startActivity(intent);
+        intent.setClass(this, DrinkMenuActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_MENU_ACTIVITY);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        if (requestCode == REQUEST_CODE_MENU_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                menuResult = data.getStringExtra("result");
+            }
+        }
     }
 }

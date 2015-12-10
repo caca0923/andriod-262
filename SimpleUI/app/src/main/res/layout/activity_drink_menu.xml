@@ -119,7 +119,8 @@
             android:layout_height="wrap_content"
             android:text="DONE"
             android:id="@+id/button10"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="done" />
     </LinearLayout>
 
 </LinearLayout>
