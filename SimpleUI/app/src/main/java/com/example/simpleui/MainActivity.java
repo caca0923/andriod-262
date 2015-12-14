@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,9 +17,11 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import org.json.JSONArray;
@@ -46,12 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this);
-
 
         setContentView(R.layout.activity_main);
         storeInfoSpinner = (Spinner) findViewById(R.id.storeInfoSpinner);
@@ -91,39 +89,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setStoreInfo() {
-        String[] stores = getResources().getStringArray(R.array.storeInfo);
-        ArrayAdapter<String> storeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, stores);
-        storeInfoSpinner.setAdapter(storeAdapter);
+
+        ParseQuery<ParseObject> query = new ParseQuery<>("StoreInfo");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                String[] stores = new String[objects.size()];
+                for (int i = 0; i < stores.length; i++) {
+                    ParseObject object = objects.get(i);
+                    stores[i] = object.getString("name") + "," + object.getString("address");
+                }
+                ArrayAdapter<String> storeAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, stores);
+                storeInfoSpinner.setAdapter(storeAdapter);
+            }
+        });
+
+//        String[] stores = getResources().getStringArray(R.array.storeInfo);
+//        ArrayAdapter<String> storeAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, stores);
+//        storeInfoSpinner.setAdapter(storeAdapter);
+
     }
 
     private void setHistory() {
-        String[] rawData = Utils.readFile(this, "history.txt").split("\n");
 
-        List<Map<String,String>> data = new ArrayList<>();
-        for (int i = 0 ; i < rawData.length; i++){
-            try {
-                JSONObject object = new JSONObject(rawData[i]);
-                String note = object.getString("note");
-                JSONArray array = object.getJSONArray("menu");
+        ParseQuery<ParseObject> query = new ParseQuery<>("Order");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                List<Map<String, String>> data = new ArrayList<>();
 
-                Map<String,String> item = new HashMap<>();
-                item.put("note",note);
-                item.put("drinkNum","15");
-                item.put("storeInfo","NTU Store");
-                data.add(item);
+                for (int i = 0; i < objects.size(); i++) {
+                    ParseObject object = objects.get(i);
+                    String note = object.getString("note");
+                    JSONArray array = object.getJSONArray("menu");
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                    Map<String, String> item = new HashMap<>();
+                    item.put("note", note);
+                    item.put("drinkNum", "15");
+                    item.put("storeInfo", "NTU Store");
+
+                    data.add(item);
+                }
+
+                String[] from = {"note", "drinkNum", "storeInfo"};
+                int[] to = {R.id.note, R.id.drinkNum, R.id.storeInfo};
+
+                SimpleAdapter adapter = new SimpleAdapter(MainActivity.this,
+                        data, R.layout.listview_item, from, to);
+
+                historyListView.setAdapter(adapter);
             }
-
-        }
-
-        String[] from = {"note","drinkNum","storeInfo"};
-        int[] to = {R.id.note,R.id.drinkNum,R.id.storeInfo};
-        SimpleAdapter adapter = new SimpleAdapter(this,data,R.layout.listview_item,from,to);
-
-        //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
-        historyListView.setAdapter(adapter);
+        });
     }
     /*
     {
@@ -147,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             ParseObject orderObject = new ParseObject("Order");
             orderObject.put("note", text);
             orderObject.put("menu", array);
-            
+
             orderObject.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
