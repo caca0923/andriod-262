@@ -44,7 +44,8 @@
         android:id="@+id/historyListView"
         android:layout_alignRight="@+id/button"
         android:layout_alignEnd="@+id/button"
-        android:layout_below="@+id/storeInfoSpinner" />
+        android:layout_below="@+id/storeInfoSpinner"
+        android:visibility="gone" />
 
     <Spinner
         android:layout_width="wrap_content"
@@ -71,5 +72,12 @@
         android:layout_alignTop="@+id/historyListView"
         android:layout_alignRight="@+id/button8"
         android:layout_alignEnd="@+id/button8" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_below="@+id/photo"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

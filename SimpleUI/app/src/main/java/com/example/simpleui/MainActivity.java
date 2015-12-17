@@ -1,5 +1,6 @@
 package com.example.simpleui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -52,8 +55,11 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
 
     private String menuResult;
+    private boolean hasPhoto = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         historyListView = (ListView) findViewById(R.id.historyListView);
         setHistory();
         setStoreInfo();
+        progressDialog = new ProgressDialog(this);
+        progressBar =   (ProgressBar)findViewById(R.id.progressBar);
 
     }
 
@@ -125,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
+
                 List<Map<String, String>> data = new ArrayList<>();
 
                 for (int i = 0; i < objects.size(); i++) {
@@ -147,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
                         data, R.layout.listview_item, from, to);
 
                 historyListView.setAdapter(adapter);
+                historyListView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+
             }
         });
     }
@@ -157,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
     }
     */
     public void submit(View view) {
+
+        progressDialog.setTitle("Logading.....");
+        progressDialog.show();
         String text = inputText.getText().toString();
         editor.putString("inputText", text);
         editor.commit();
@@ -173,9 +188,16 @@ public class MainActivity extends AppCompatActivity {
             orderObject.put("note", text);
             orderObject.put("menu", array);
 
+            if (hasPhoto == true){
+                Uri uri = Utils.getPhotoUri();
+                ParseFile parseFile = new ParseFile("photo.png",Utils.urlTobytes(this, uri));
+                orderObject.put("photo",parseFile);
+            }
+
             orderObject.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
+                    progressDialog.dismiss();
                     if (e == null) {
                         Toast.makeText(MainActivity.this, "[SaveCallback] ok", Toast.LENGTH_SHORT).show();
                     } else {
@@ -215,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
                 //Bitmap bm = data.getParcelableExtra("data");
                 Uri uri = Utils.getPhotoUri();
                 photoImageView.setImageURI(uri);
+                hasPhoto = true;
+
             }
         }
     }
