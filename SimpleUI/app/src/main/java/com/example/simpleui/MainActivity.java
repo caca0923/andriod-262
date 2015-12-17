@@ -3,6 +3,9 @@ package com.example.simpleui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
@@ -38,11 +42,13 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_MENU_ACTIVITY = 1;
+    private static final int REQUEST_TAKE_PHOTO = 2;
 
     private EditText inputText;
     private CheckBox hideCheckBox;
     private ListView historyListView;
     private Spinner storeInfoSpinner;
+    private ImageView photoImageView;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -58,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
+        photoImageView = (ImageView) findViewById(R.id.photo);
         inputText = (EditText) findViewById(R.id.inputText);
 //        inputText.setText("1234");
         inputText.setText(sharedPreferences.getString("inputText", ""));
@@ -203,6 +210,12 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 menuResult = data.getStringExtra("result");
             }
+        } else if(requestCode == REQUEST_TAKE_PHOTO){
+            if(resultCode == RESULT_OK){
+                //Bitmap bm = data.getParcelableExtra("data");
+                Uri uri = Utils.getPhotoUri();
+                photoImageView.setImageURI(uri);
+            }
         }
     }
 
@@ -218,8 +231,18 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_take_photo){
             Toast.makeText(this,"take photo",Toast.LENGTH_SHORT).show();
+            goToCamera();
+
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goToCamera(){
+        Intent intent = new Intent();
+        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,Utils.getPhotoUri());
+        startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+
     }
 
 
