@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".OrderDetailActivity">
+    tools:context=".OrderDetailActivity">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
         android:id="@+id/address"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/staticMap"
-        android:src="@mipmap/ic_launcher"
-        android:layout_alignParentTop="true"
+        android:id="@+id/staticMapImage"
+        android:layout_below="@+id/address"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:src="@mipmap/ic_launcher"
         android:visibility="gone" />
 
     <Switch
@@ -28,28 +34,26 @@
         android:layout_height="wrap_content"
         android:text="New Switch"
         android:id="@+id/mapSwitch"
-        android:checked="false"
-        android:layout_below="@+id/staticMap"
-        android:layout_alignRight="@+id/address"
-        android:layout_alignEnd="@+id/address" />
+        android:layout_alignBottom="@+id/address"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:checked="false" />
 
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/webView"
-        android:layout_below="@+id/mapSwitch"
-        android:layout_toStartOf="@+id/mapSwitch"
-        android:layout_alignRight="@+id/address"
-        android:layout_alignEnd="@+id/address"
+        android:layout_below="@+id/address"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:visibility="gone" />
 
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.MapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/googleMap"
-        android:layout_below="@+id/mapSwitch"
+        android:layout_below="@+id/address"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
-</RelativeLayout >
+</RelativeLayout>
