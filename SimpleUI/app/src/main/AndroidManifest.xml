@@ -5,21 +5,24 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name=".SimpleUiApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".SimpleUiApplication">
-
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.parse.APPLICATION_ID"
             android:value="Z9rxcvzWA9zbiXtsOssPDvxuyAXYDSIp9JFKQpSv" />
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="MoyCm4v4v9HtlQH7DOA7PC5MY7f6o96bReUeWQGS" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyANhDgvb6MfhPe2J5nLx7xjWiIDyTSK6ek" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -31,6 +34,10 @@
         <activity
             android:name=".DrinkMenuActivity"
             android:label="@string/title_activity_drink_menu"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".OrderDetailActivity"
+            android:label="@string/title_activity_order_detail"
             android:theme="@style/AppTheme"></activity>
     </application>
 
